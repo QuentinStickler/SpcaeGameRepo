@@ -6,7 +6,7 @@ public class MapDisplay : MonoBehaviour     //macht die Noisemap zu ner texture 
 {
     public Renderer textureRenderer;
     public MeshFilter filter;
-    public MeshRenderer MeshRenderer;
+    public MeshRenderer meshRenderer;
 
     public void DrawTexture(Texture2D texture)
     {
@@ -17,6 +17,6 @@ public class MapDisplay : MonoBehaviour     //macht die Noisemap zu ner texture 
     public void drawMesh(MeshData data, Texture2D texture)
     {
         filter.sharedMesh = data.createMesh();
-        MeshRenderer.sharedMaterial.mainTexture = texture;
+        meshRenderer.sharedMaterial.mainTexture = texture;
     }
 }
