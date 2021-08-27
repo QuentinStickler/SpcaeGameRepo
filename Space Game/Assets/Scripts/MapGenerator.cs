@@ -128,7 +128,6 @@ public class MapGenerator : MonoBehaviour
                 }
             }
         }
-
         return new MapData(noiseMap, colorMap);
     }
 

@@ -81,6 +81,8 @@ public class InfiniteTerrain : MonoBehaviour
         
         private LODInfo[] detailLevels;
         private LoDMesh[] lodMeshes;
+        private LoDMesh collisionLoDMesh;
+        
         private MapData mapData;
         private bool mapDataReceived;
         private int prevLodIndex = 1;
@@ -106,6 +108,10 @@ public class InfiniteTerrain : MonoBehaviour
             for (int i = 0; i < detailLevels.Length; i++)
             {
                 lodMeshes[i] = new LoDMesh(detailLevels[i].lod,UpdateChunkVisibility);
+                if (detailLevels[i].useForCollider)
+                {
+                    collisionLoDMesh = lodMeshes[i];
+                }
             }
             
             mapGenerator.RequestMapData(pos,OnMapDataReceived);
@@ -154,11 +160,22 @@ public class InfiniteTerrain : MonoBehaviour
                         {
                             prevLodIndex = lodIndex;
                             meshFilter.mesh = lodMesh.mesh;
-                            meshCollider.sharedMesh = lodMesh.mesh;
                         }
                         else if (!lodMesh.hasRequestedMesh)
                         {
                             lodMesh.RequestMesh(mapData);
+                        }
+                    }
+
+                    if (lodIndex == 0)
+                    {
+                        if (collisionLoDMesh.hasMesh)
+                        {
+                            meshCollider.sharedMesh = collisionLoDMesh.mesh;
+                        }
+                        else if (!collisionLoDMesh.hasRequestedMesh)
+                        {
+                            collisionLoDMesh.RequestMesh(mapData);
                         }
                     }
                     terrainChunksVisibleLastUpdate.Add(this);
@@ -212,5 +229,6 @@ public class InfiniteTerrain : MonoBehaviour
     {
         public int lod;
         public float visibleDistanceThreshold;
+        public bool useForCollider;
     }
 }
