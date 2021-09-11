@@ -8,22 +8,39 @@ public class Planet : MonoBehaviour //Wir erstellen einen Planeten, indem wir 6 
     [Range(2,256)]
     public int resolution = 10;
 
+    public bool autoUpdate;
+
     public ColorSettings colorSettings;
     public ShapeSettings shapeSettings;
-    private ShapeGenerator shapeGenerator;
+    private ShapeGenerator shapeGenerator = new ShapeGenerator();
+    private ColorGenerator colorGenerator = new ColorGenerator();
+
+    public enum FaceRenderMask
+    {
+        All,
+        Top,
+        Bottom,
+        Left,
+        Right,
+        Front,
+        Back
+    };
+
+    public FaceRenderMask faceRenderMask;
+
+    [HideInInspector]
+    public bool shapeSettingsFoldOut;
+    [HideInInspector]
+    public bool colorSettingsFoldout;
     
     [SerializeField,HideInInspector]
     private MeshFilter[] meshFilters;
     private TerrainFace[] terrainFaces;
-
-    private void OnValidate()
-    {
-       GeneratePlanet();
-    }
-
+    
     void Initialize()
     {
-        shapeGenerator = new ShapeGenerator(shapeSettings);
+        shapeGenerator.UpdateSettings(shapeSettings);
+        colorGenerator.UpdateSettings(colorSettings);
         if (meshFilters == null || meshFilters.Length == 0)
         {
             meshFilters = new MeshFilter[6];
@@ -39,11 +56,16 @@ public class Planet : MonoBehaviour //Wir erstellen einen Planeten, indem wir 6 
                 GameObject meshObj = new GameObject("mesh");
                 meshObj.transform.parent = transform;
 
-                meshObj.AddComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard"));
+                meshObj.AddComponent<MeshRenderer>();
                 meshFilters[i] = meshObj.AddComponent<MeshFilter>();
                 meshFilters[i].sharedMesh = new Mesh();
             }
+
+            meshFilters[i].GetComponent<MeshRenderer>().sharedMaterial = colorSettings.planetMaterial;
+            
             terrainFaces[i] = new TerrainFace(shapeGenerator, meshFilters[i].sharedMesh, resolution, directions[i]);
+            bool renderFace = faceRenderMask == FaceRenderMask.All || (int) faceRenderMask - 1 == i;
+            meshFilters[i].gameObject.SetActive(renderFace);
         }
     }
 
@@ -56,8 +78,11 @@ public class Planet : MonoBehaviour //Wir erstellen einen Planeten, indem wir 6 
 
     public void OnShapeSettingsChanged()
     {
-        Initialize();
-        GenerateMesh();
+        if (autoUpdate)
+        {
+            Initialize();
+            GenerateMesh();
+        }
     }
     
     public void OnPlanetColorChanged()
@@ -68,17 +93,19 @@ public class Planet : MonoBehaviour //Wir erstellen einen Planeten, indem wir 6 
     
     void GenerateMesh()
     {
-        foreach (TerrainFace i in terrainFaces)
+        for (int i = 0; i < 6; i++)
         {
-          i.ConstructMesh();
+            if (meshFilters[i].gameObject.activeSelf)
+            {
+                terrainFaces[i].ConstructMesh();
+            }
         }
+        
+        colorGenerator.UpdateElevation(shapeGenerator.minMax);
     }
 
     void GenerateColors()
     {
-        foreach (MeshFilter m in meshFilters)
-        {
-            m.GetComponent<MeshRenderer>().sharedMaterial.color = colorSettings.planetColor;
-        }
+        colorGenerator.UpdateColors();
     }
 }
