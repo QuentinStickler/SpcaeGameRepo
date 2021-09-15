@@ -87,8 +87,11 @@ public class Planet : MonoBehaviour //Wir erstellen einen Planeten, indem wir 6 
     
     public void OnPlanetColorChanged()
     {
-        Initialize();
-        GenerateColors();
+        if (autoUpdate)
+        {
+            Initialize();
+            GenerateColors();
+        }
     }
     
     void GenerateMesh()

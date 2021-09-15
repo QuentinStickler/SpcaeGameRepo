@@ -30,6 +30,7 @@ public class TerrainFace //Erstllet ein Mesh für ein TerrainFace
         Vector3[] vertices = new Vector3[resolution * resolution];
         int[] triangles = new int[(resolution - 1) * (resolution - 1) * 6];
         int triIndex = 0;
+        
         for (int y = 0; y < resolution; y++)
         {
             for (int x = 0; x < resolution; x++)
@@ -56,6 +57,6 @@ public class TerrainFace //Erstllet ein Mesh für ein TerrainFace
         mesh.Clear();
         mesh.vertices = vertices;
         mesh.triangles = triangles;
-        mesh.normals = vertices;
+        mesh.RecalculateNormals();
     }
 }
