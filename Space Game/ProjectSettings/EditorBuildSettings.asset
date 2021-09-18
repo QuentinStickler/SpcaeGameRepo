@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/TerrainScene.unity
-    guid: de536699df9ee2c44bf63e16d07be0f9
+    path: Assets/Scenes/Star Wars Test.unity
+    guid: 784f0604e80ba124e8dabaa35066c71f
   m_configObjects: {}

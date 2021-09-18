@@ -24,10 +24,12 @@ public class PlayerController : MonoBehaviour
     private InputAction moveAction;
     private InputAction jumpAction;
     private Transform cam;
+    private Animator animator;
     
     private void Start()
     {
         controller = gameObject.GetComponent<CharacterController>();
+        animator = GetComponent<Animator>();
         cam = Camera.main.transform;
         playerInput = GetComponent<PlayerInput>();
         moveAction = playerInput.actions["Move"];
@@ -48,6 +50,9 @@ public class PlayerController : MonoBehaviour
         move.y = 0f;
         controller.Move(move * Time.deltaTime * playerSpeed);
 
+        animator.SetFloat("VelocityX",moveInput.x,0.1f,Time.deltaTime);
+        animator.SetFloat("VelocityZ",moveInput.y,0.1f,Time.deltaTime);
+
         // Changes the height position of the player..
         if (jumpAction.triggered && groundedPlayer)
         {
@@ -56,7 +61,7 @@ public class PlayerController : MonoBehaviour
 
         playerVelocity.y += gravityValue * Time.deltaTime;
         controller.Move(playerVelocity * Time.deltaTime);
-        
+
         Quaternion targetRot = Quaternion.Euler(0,cam.eulerAngles.y,0);
         transform.rotation = Quaternion.Lerp(transform.rotation,targetRot, rotationSpeed * Time.deltaTime);
     }
