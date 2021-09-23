@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,7 +26,7 @@ public class PlayerController : MonoBehaviour
     private InputAction jumpAction;
     private Transform cam;
     private Animator animator;
-    
+
     private void Start()
     {
         controller = gameObject.GetComponent<CharacterController>();
@@ -34,11 +35,13 @@ public class PlayerController : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
         moveAction = playerInput.actions["Move"];
         jumpAction = playerInput.actions["Jump"];
+        animator.SetBool("isGrounded",true);
     }
 
     void Update()
     {
         groundedPlayer = controller.isGrounded;
+        animator.SetBool("isGrounded",groundedPlayer);
         if (groundedPlayer && playerVelocity.y < 0)
         {
             playerVelocity.y = 0f;
@@ -49,7 +52,7 @@ public class PlayerController : MonoBehaviour
         move = move.x * cam.right.normalized + move.z * cam.forward.normalized;
         move.y = 0f;
         controller.Move(move * Time.deltaTime * playerSpeed);
-
+    
         animator.SetFloat("VelocityX",moveInput.x,0.1f,Time.deltaTime);
         animator.SetFloat("VelocityZ",moveInput.y,0.1f,Time.deltaTime);
 
@@ -57,6 +60,7 @@ public class PlayerController : MonoBehaviour
         if (jumpAction.triggered && groundedPlayer)
         {
             playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
+            animator.SetBool("isGrounded",false);
         }
 
         playerVelocity.y += gravityValue * Time.deltaTime;
@@ -65,4 +69,5 @@ public class PlayerController : MonoBehaviour
         Quaternion targetRot = Quaternion.Euler(0,cam.eulerAngles.y,0);
         transform.rotation = Quaternion.Lerp(transform.rotation,targetRot, rotationSpeed * Time.deltaTime);
     }
+    
 }
